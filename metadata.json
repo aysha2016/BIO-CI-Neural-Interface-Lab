@@ -1,0 +1,6 @@
+{
+  "name": "BIO-CI Neural Interface Lab",
+  "description": "Biologically Realistic Cochlear Implant–Auditory Nerve Simulation and Neural Engineering Dashboard",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
