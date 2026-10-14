@@ -78,18 +78,24 @@ export const CochleaViewer3D: React.FC<CochleaViewer3DProps> = ({
 
     let animId: number;
     let time = 0;
+    let localRotY = rotY;
 
     const render = () => {
       time += 0.03;
 
       if (autoRotate && !isDraggingRef.current) {
-        setRotY((prev) => prev + 0.001);
+        localRotY += 0.0015;
       }
 
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
       const width = rect.width;
       const height = rect.height;
+
+      if (!width || !height || width <= 0 || height <= 0) {
+        animId = requestAnimationFrame(render);
+        return;
+      }
 
       if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
         canvas.width = width * dpr;
@@ -110,7 +116,7 @@ export const CochleaViewer3D: React.FC<CochleaViewer3DProps> = ({
         // Center with slight 3D rotation transform
         ctx.translate(width / 2, height / 2);
         ctx.scale(zoomLevel, zoomLevel);
-        ctx.rotate(rotY * 0.15);
+        ctx.rotate(localRotY * 0.15);
 
         // Aspect ratio cover/fit
         const img = imageRef.current;
@@ -256,7 +262,11 @@ export const CochleaViewer3D: React.FC<CochleaViewer3DProps> = ({
       ctx.strokeStyle = '#38bdf8';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(tagX, tagY - badgeH / 2, badgeW, badgeH, 5);
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(tagX, tagY - badgeH / 2, badgeW, badgeH, 5);
+      } else {
+        ctx.rect(tagX, tagY - badgeH / 2, badgeW, badgeH);
+      }
       ctx.fill();
       ctx.stroke();
 

@@ -28,6 +28,10 @@ export const SpikeRasterCard: React.FC<SpikeRasterCardProps> = ({
     const width = rect.width;
     const height = rect.height;
 
+    if (!width || !height || width <= 0 || height <= 0) {
+      return;
+    }
+
     if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
       canvas.width = width * dpr;
       canvas.height = height * dpr;

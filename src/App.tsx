@@ -30,6 +30,7 @@ import { ResearchDocumentationModal } from './components/modals/ResearchDocument
 import { SimulationSettingsModal } from './components/modals/SimulationSettingsModal';
 import { ModelFidelityModal } from './components/modals/ModelFidelityModal';
 import { MetricDetailModal } from './components/modals/MetricDetailModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 function MainAppContent() {
   const { activeTab, setActiveTab, researchMode, setResearchMode } = useSimulation();
@@ -142,8 +143,10 @@ function MainAppContent() {
 
 export default function App() {
   return (
-    <SimulationProvider>
-      <MainAppContent />
-    </SimulationProvider>
+    <ErrorBoundary>
+      <SimulationProvider>
+        <MainAppContent />
+      </SimulationProvider>
+    </ErrorBoundary>
   );
 }
