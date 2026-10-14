@@ -9,6 +9,10 @@
     <meta property="og:description" content="Biologically Realistic Cochlear Implant–Auditory Nerve Simulation and Neural Engineering Dashboard" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+    <!-- Prevent stale caching on GitHub Pages Fastly CDN -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -22,21 +26,91 @@
         }
       })();
     </script>
-    <script type="module" crossorigin src="/BIO-CI-Neural-Interface-Lab/assets/index-CzaWHTIF.js"></script>
-    <link rel="stylesheet" crossorigin href="/BIO-CI-Neural-Interface-Lab/assets/index-Cu1L_tWy.css">
+    <script type="module" crossorigin src="/BIO-CI-Neural-Interface-Lab/assets/index-C1_hSJYO.js"></script>
+    <link rel="modulepreload" crossorigin href="/BIO-CI-Neural-Interface-Lab/assets/rolldown-runtime-WkwZ5CU-.js">
+    <link rel="modulepreload" crossorigin href="/BIO-CI-Neural-Interface-Lab/assets/vendor-lucide-BlvTTEuI.js">
+    <link rel="modulepreload" crossorigin href="/BIO-CI-Neural-Interface-Lab/assets/vendor-react-nzkDXb4_.js">
+    <link rel="stylesheet" crossorigin href="/BIO-CI-Neural-Interface-Lab/assets/index-Bcy9uZcK.css">
   </head>
   <body class="bg-[#070b14] text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
     <div id="root">
-      <!-- Fast Preloader Shell (Replaced immediately upon React mount) -->
-      <div style="min-height: 100vh; background-color: #070b14; display: flex; align-items: center; justify-content: center; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: #94a3b8;">
-        <div style="text-align: center; max-width: 440px; padding: 24px; background: rgba(11, 19, 36, 0.7); border: 1px solid #1e293b; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);">
-          <div style="width: 44px; height: 44px; margin: 0 auto 16px; border: 3px solid rgba(6, 182, 212, 0.2); border-top-color: #06b6d4; border-radius: 50%; animation: bio-spin 0.8s linear infinite;"></div>
-          <h1 style="color: #f8fafc; font-size: 17px; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.01em;">BIO-CI Neural Interface Lab</h1>
-          <p style="font-size: 13px; line-height: 1.5; margin: 0; color: #64748b;">Loading biophysical neural simulation workspace...</p>
+      <!-- High-Performance Preloader Shell with Active Progress Bar -->
+      <div id="bio-loader-shell" style="min-height: 100vh; background-color: #070b14; display: flex; align-items: center; justify-content: center; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: #94a3b8; padding: 20px;">
+        <div style="text-align: center; max-width: 460px; width: 100%; padding: 28px; background: rgba(11, 19, 36, 0.85); border: 1px solid #1e293b; border-radius: 20px; box-shadow: 0 25px 35px -5px rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px);">
+          
+          <!-- Animated Pulse Icon -->
+          <div style="position: relative; width: 52px; height: 52px; margin: 0 auto 18px;">
+            <div style="position: absolute; inset: 0; border: 3px solid rgba(6, 182, 212, 0.15); border-radius: 50%;"></div>
+            <div style="position: absolute; inset: 0; border: 3px solid transparent; border-top-color: #06b6d4; border-right-color: #06b6d4; border-radius: 50%; animation: bio-spin 0.75s linear infinite;"></div>
+            <div style="position: absolute; inset: 9px; background: rgba(6, 182, 212, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+              <div style="width: 10px; height: 10px; background: #06b6d4; border-radius: 50%; box-shadow: 0 0 12px #06b6d4;"></div>
+            </div>
+          </div>
+
+          <h1 style="color: #f8fafc; font-size: 18px; font-weight: 700; margin: 0 0 4px 0; letter-spacing: -0.01em;">
+            BIO-CI Neural Interface Lab
+          </h1>
+          <p id="bio-loader-status" style="font-size: 13px; line-height: 1.5; margin: 0 0 16px 0; color: #67e8f9; font-family: 'JetBrains Mono', monospace;">
+            Initializing neural simulation workspace...
+          </p>
+
+          <!-- Active Loading Bar -->
+          <div style="width: 100%; height: 5px; background: #131d31; border-radius: 9999px; overflow: hidden; position: relative; margin-bottom: 12px; border: 1px solid #1e293b;">
+            <div id="bio-loader-bar" style="height: 100%; width: 12%; background: linear-gradient(90deg, #06b6d4, #38bdf8); border-radius: 9999px; transition: width 0.3s ease; box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);"></div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b; font-family: 'JetBrains Mono', monospace;">
+            <span id="bio-loader-step">Step 1/3: Modules loaded</span>
+            <span id="bio-loader-pct">25%</span>
+          </div>
+
+          <!-- Stalled network fallback alert (hidden initially) -->
+          <div id="bio-loader-fallback" style="display: none; margin-top: 18px; padding-top: 14px; border-top: 1px solid #1e293b; text-align: center;">
+            <p style="font-size: 12px; color: #94a3b8; margin: 0 0 10px 0;">
+              Taking longer than usual from GitHub CDN?
+            </p>
+            <button onclick="window.location.reload(true)" style="background: #0891b2; color: white; border: none; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+              Refresh &amp; Bypass Cache
+            </button>
+          </div>
+
         </div>
       </div>
       <style>@keyframes bio-spin{to{transform:rotate(360deg)}}</style>
+      <script>
+        (function() {
+          var bar = document.getElementById('bio-loader-bar');
+          var pct = document.getElementById('bio-loader-pct');
+          var status = document.getElementById('bio-loader-status');
+          var step = document.getElementById('bio-loader-step');
+          var fallback = document.getElementById('bio-loader-fallback');
+          var progress = 15;
+
+          var timer = setInterval(function() {
+            if (progress < 92) {
+              progress += Math.floor(Math.random() * 14) + 8;
+              if (progress > 92) progress = 92;
+              if (bar) bar.style.width = progress + '%';
+              if (pct) pct.innerText = progress + '%';
+              
+              if (progress > 40 && progress < 70 && status) {
+                status.innerText = 'Compiling biophysical Hodgkin-Huxley & multi-compartment solvers...';
+                if (step) step.innerText = 'Step 2/3: Biophysics ready';
+              } else if (progress >= 70 && status) {
+                status.innerText = 'Mounting 3D cochlea canvas & interactive neural dashboard...';
+                if (step) step.innerText = 'Step 3/3: Mounting UI';
+              }
+            }
+          }, 240);
+
+          // Show fallback button if bundle download takes more than 7s
+          setTimeout(function() {
+            if (fallback && document.getElementById('bio-loader-shell')) {
+              fallback.style.display = 'block';
+            }
+          }, 7000);
+        })();
+      </script>
     </div>
   </body>
 </html>
-
