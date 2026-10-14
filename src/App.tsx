@@ -3,34 +3,43 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { SimulationProvider, useSimulation } from './context/SimulationContext';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { OverviewWorkspace } from './components/workspaces/OverviewWorkspace';
-import { NeuralModelWorkspace } from './components/workspaces/NeuralModelWorkspace';
-import { CochleaElectrodesWorkspace } from './components/workspaces/CochleaElectrodesWorkspace';
-import { ElectricalFieldWorkspace } from './components/workspaces/ElectricalFieldWorkspace';
-import { NerveFiberSimulationWorkspace } from './components/workspaces/NerveFiberSimulationWorkspace';
-import { RefractoryPeriodWorkspace } from './components/workspaces/RefractoryPeriodWorkspace';
-import { AdaptationWorkspace } from './components/workspaces/AdaptationWorkspace';
-import { FiberPopulationWorkspace } from './components/workspaces/FiberPopulationWorkspace';
-import { PatientSpecificWorkspace } from './components/workspaces/PatientSpecificWorkspace';
-import { SnnDecoderWorkspace } from './components/workspaces/SnnDecoderWorkspace';
-import { AiOptimizationWorkspace } from './components/workspaces/AiOptimizationWorkspace';
-import { ExperimentsWorkspace } from './components/workspaces/ExperimentsWorkspace';
-import { ResearchInsightsWorkspace } from './components/workspaces/ResearchInsightsWorkspace';
-
-// Modals
-import { ResearchGapModal } from './components/ResearchGapModal';
-import { AiAssistantModal } from './components/AiAssistantModal';
-import { ExportModal } from './components/ExportModal';
-import { SimulationStatusModal } from './components/modals/SimulationStatusModal';
-import { ResearchDocumentationModal } from './components/modals/ResearchDocumentationModal';
-import { SimulationSettingsModal } from './components/modals/SimulationSettingsModal';
-import { ModelFidelityModal } from './components/modals/ModelFidelityModal';
-import { MetricDetailModal } from './components/modals/MetricDetailModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
+
+// Code-split secondary workspaces to reduce initial bundle size and speed up page load
+const NeuralModelWorkspace = lazy(() => import('./components/workspaces/NeuralModelWorkspace').then(m => ({ default: m.NeuralModelWorkspace })));
+const CochleaElectrodesWorkspace = lazy(() => import('./components/workspaces/CochleaElectrodesWorkspace').then(m => ({ default: m.CochleaElectrodesWorkspace })));
+const ElectricalFieldWorkspace = lazy(() => import('./components/workspaces/ElectricalFieldWorkspace').then(m => ({ default: m.ElectricalFieldWorkspace })));
+const NerveFiberSimulationWorkspace = lazy(() => import('./components/workspaces/NerveFiberSimulationWorkspace').then(m => ({ default: m.NerveFiberSimulationWorkspace })));
+const RefractoryPeriodWorkspace = lazy(() => import('./components/workspaces/RefractoryPeriodWorkspace').then(m => ({ default: m.RefractoryPeriodWorkspace })));
+const AdaptationWorkspace = lazy(() => import('./components/workspaces/AdaptationWorkspace').then(m => ({ default: m.AdaptationWorkspace })));
+const FiberPopulationWorkspace = lazy(() => import('./components/workspaces/FiberPopulationWorkspace').then(m => ({ default: m.FiberPopulationWorkspace })));
+const PatientSpecificWorkspace = lazy(() => import('./components/workspaces/PatientSpecificWorkspace').then(m => ({ default: m.PatientSpecificWorkspace })));
+const SnnDecoderWorkspace = lazy(() => import('./components/workspaces/SnnDecoderWorkspace').then(m => ({ default: m.SnnDecoderWorkspace })));
+const AiOptimizationWorkspace = lazy(() => import('./components/workspaces/AiOptimizationWorkspace').then(m => ({ default: m.AiOptimizationWorkspace })));
+const ExperimentsWorkspace = lazy(() => import('./components/workspaces/ExperimentsWorkspace').then(m => ({ default: m.ExperimentsWorkspace })));
+const ResearchInsightsWorkspace = lazy(() => import('./components/workspaces/ResearchInsightsWorkspace').then(m => ({ default: m.ResearchInsightsWorkspace })));
+
+// Code-split modals
+const ResearchGapModal = lazy(() => import('./components/ResearchGapModal').then(m => ({ default: m.ResearchGapModal })));
+const AiAssistantModal = lazy(() => import('./components/AiAssistantModal').then(m => ({ default: m.AiAssistantModal })));
+const ExportModal = lazy(() => import('./components/ExportModal').then(m => ({ default: m.ExportModal })));
+const SimulationStatusModal = lazy(() => import('./components/modals/SimulationStatusModal').then(m => ({ default: m.SimulationStatusModal })));
+const ResearchDocumentationModal = lazy(() => import('./components/modals/ResearchDocumentationModal').then(m => ({ default: m.ResearchDocumentationModal })));
+const SimulationSettingsModal = lazy(() => import('./components/modals/SimulationSettingsModal').then(m => ({ default: m.SimulationSettingsModal })));
+const ModelFidelityModal = lazy(() => import('./components/modals/ModelFidelityModal').then(m => ({ default: m.ModelFidelityModal })));
+const MetricDetailModal = lazy(() => import('./components/modals/MetricDetailModal').then(m => ({ default: m.MetricDetailModal })));
+
+const WorkspaceFallback = () => (
+  <div className="flex flex-col items-center justify-center p-16 text-slate-400 min-h-[300px]">
+    <div className="w-8 h-8 border-2 border-cyan-500/20 border-t-cyan-400 rounded-full animate-spin mb-3" />
+    <span className="text-xs font-mono text-cyan-400 tracking-wider">Loading workspace module...</span>
+  </div>
+);
 
 function MainAppContent() {
   const { activeTab, setActiveTab, researchMode, setResearchMode } = useSimulation();
@@ -81,62 +90,75 @@ function MainAppContent() {
               onOpenMetricDetail={(metricName) => setSelectedMetricName(metricName)}
             />
           )}
-          {activeTab === 'neural-model' && <NeuralModelWorkspace />}
-          {activeTab === 'cochlea-electrodes' && <CochleaElectrodesWorkspace />}
-          {activeTab === 'electrical-field' && <ElectricalFieldWorkspace />}
-          {activeTab === 'nerve-fiber-sim' && <NerveFiberSimulationWorkspace />}
-          {activeTab === 'refractory-lab' && <RefractoryPeriodWorkspace />}
-          {activeTab === 'adaptation-lab' && <AdaptationWorkspace />}
-          {activeTab === 'fiber-population' && <FiberPopulationWorkspace />}
-          {activeTab === 'patient-model' && <PatientSpecificWorkspace />}
-          {activeTab === 'snn-decoder' && <SnnDecoderWorkspace />}
-          {activeTab === 'ai-optimization' && <AiOptimizationWorkspace />}
-          {activeTab === 'experiments' && <ExperimentsWorkspace />}
-          {activeTab === 'research-insights' && <ResearchInsightsWorkspace />}
+          <Suspense fallback={<WorkspaceFallback />}>
+            {activeTab === 'neural-model' && <NeuralModelWorkspace />}
+            {activeTab === 'cochlea-electrodes' && <CochleaElectrodesWorkspace />}
+            {activeTab === 'electrical-field' && <ElectricalFieldWorkspace />}
+            {activeTab === 'nerve-fiber-sim' && <NerveFiberSimulationWorkspace />}
+            {activeTab === 'refractory-lab' && <RefractoryPeriodWorkspace />}
+            {activeTab === 'adaptation-lab' && <AdaptationWorkspace />}
+            {activeTab === 'fiber-population' && <FiberPopulationWorkspace />}
+            {activeTab === 'patient-model' && <PatientSpecificWorkspace />}
+            {activeTab === 'snn-decoder' && <SnnDecoderWorkspace />}
+            {activeTab === 'ai-optimization' && <AiOptimizationWorkspace />}
+            {activeTab === 'experiments' && <ExperimentsWorkspace />}
+            {activeTab === 'research-insights' && <ResearchInsightsWorkspace />}
+          </Suspense>
         </main>
       </div>
 
-      {/* Modals Collection */}
-      <SimulationStatusModal
-        isOpen={isStatusOpen}
-        onClose={() => setIsStatusOpen(false)}
-      />
-
-      <ResearchDocumentationModal
-        isOpen={isDocsOpen}
-        onClose={() => setIsDocsOpen(false)}
-      />
-
-      <ExportModal
-        isOpen={isExportOpen}
-        onClose={() => setIsExportOpen(false)}
-      />
-
-      <SimulationSettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
-
-      <AiAssistantModal
-        isOpen={isAiOpen}
-        onClose={() => setIsAiOpen(false)}
-      />
-
-      <ResearchGapModal
-        isOpen={isResearchGapOpen}
-        onClose={() => setIsResearchGapOpen(false)}
-      />
-
-      <ModelFidelityModal
-        isOpen={isModelFidelityOpen}
-        onClose={() => setIsModelFidelityOpen(false)}
-        selectedCategory={selectedFidelityCategory}
-      />
-
-      <MetricDetailModal
-        metricName={selectedMetricName}
-        onClose={() => setSelectedMetricName(null)}
-      />
+      {/* Modals Collection (Lazy Loaded) */}
+      <Suspense fallback={null}>
+        {isStatusOpen && (
+          <SimulationStatusModal
+            isOpen={isStatusOpen}
+            onClose={() => setIsStatusOpen(false)}
+          />
+        )}
+        {isDocsOpen && (
+          <ResearchDocumentationModal
+            isOpen={isDocsOpen}
+            onClose={() => setIsDocsOpen(false)}
+          />
+        )}
+        {isExportOpen && (
+          <ExportModal
+            isOpen={isExportOpen}
+            onClose={() => setIsExportOpen(false)}
+          />
+        )}
+        {isSettingsOpen && (
+          <SimulationSettingsModal
+            isOpen={isSettingsOpen}
+            onClose={() => setIsSettingsOpen(false)}
+          />
+        )}
+        {isAiOpen && (
+          <AiAssistantModal
+            isOpen={isAiOpen}
+            onClose={() => setIsAiOpen(false)}
+          />
+        )}
+        {isResearchGapOpen && (
+          <ResearchGapModal
+            isOpen={isResearchGapOpen}
+            onClose={() => setIsResearchGapOpen(false)}
+          />
+        )}
+        {isModelFidelityOpen && (
+          <ModelFidelityModal
+            isOpen={isModelFidelityOpen}
+            onClose={() => setIsModelFidelityOpen(false)}
+            selectedCategory={selectedFidelityCategory}
+          />
+        )}
+        {selectedMetricName && (
+          <MetricDetailModal
+            metricName={selectedMetricName}
+            onClose={() => setSelectedMetricName(null)}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }
