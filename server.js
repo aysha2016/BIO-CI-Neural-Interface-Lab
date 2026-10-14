@@ -13,7 +13,8 @@ app.get('/healthz', (req, res) => {
   res.status(200).send('OK');
 });
 
-// Serve compiled static files from dist
+// Serve compiled static files from dist for both base path and root
+app.use('/BIO-CI-Neural-Interface-Lab', express.static(path.join(__dirname, 'dist')));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // Fallback to index.html for Single Page Application

@@ -3,8 +3,10 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
-export default defineConfig(() => {
+export default defineConfig(({ command }) => {
   return {
+    // GitHub Pages repository subpath for production builds
+    base: process.env.VITE_BASE_PATH || (command === 'build' ? '/BIO-CI-Neural-Interface-Lab/' : '/'),
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
