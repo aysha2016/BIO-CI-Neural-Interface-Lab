@@ -81,9 +81,72 @@
           var status = document.getElementById('bio-loader-status');
           var step = document.getElementById('bio-loader-step');
           var fallback = document.getElementById('bio-loader-fallback');
+          var shell = document.getElementById('bio-loader-shell');
           var progress = 15;
+          var isMounted = false;
+
+          // Expose explicit completion handler for React to trigger on mount
+          window.bioAppMounted = function() {
+            if (isMounted) return;
+            isMounted = true;
+            clearInterval(timer);
+            if (bar) bar.style.width = '100%';
+            if (pct) pct.innerText = '100%';
+            if (status) status.innerText = 'BIO-CI Neural Interface Lab ready.';
+            if (step) step.innerText = 'Step 3/3: Complete';
+            setTimeout(function() {
+              if (shell) {
+                shell.style.transition = 'opacity 0.25s ease-out, transform 0.25s ease-out';
+                shell.style.opacity = '0';
+                shell.style.transform = 'scale(0.98)';
+                setTimeout(function() {
+                  if (shell && shell.parentNode) {
+                    shell.parentNode.removeChild(shell);
+                  }
+                }, 260);
+              }
+            }, 80);
+          };
+
+          // Function to display diagnostics if an error occurs
+          window.bioShowError = function(errMsg, details) {
+            clearInterval(timer);
+            if (bar) {
+              bar.style.width = '100%';
+              bar.style.background = '#ef4444';
+            }
+            if (pct) pct.innerText = 'Error';
+            if (status) {
+              status.style.color = '#f87171';
+              status.innerText = errMsg || 'Startup initialization error';
+            }
+            if (fallback) {
+              fallback.style.display = 'block';
+              fallback.innerHTML = `
+                <div style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 12px; margin-bottom: 12px; text-align: left;">
+                  <div style="color: #fca5a5; font-size: 11px; font-weight: 600; margin-bottom: 4px;">Initialization Diagnostic:</div>
+                  <div style="color: #cbd5e1; font-size: 10.5px; font-family: monospace; word-break: break-all;">${details || errMsg}</div>
+                </div>
+                <button onclick="window.location.reload(true)" style="background: #0891b2; color: white; border: none; padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                  Reload Lab
+                </button>
+              `;
+            }
+          };
+
+          // Check if being served directly on GitHub Pages from uncompiled main branch
+          var isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
+          var isRawScript = document.querySelector('script[src*="/src/main.tsx"]');
+          if (isGitHubPages && isRawScript) {
+            window.bioShowError(
+              'GitHub Pages Source Misconfiguration',
+              'GitHub Pages is serving the raw repository root (main branch) instead of compiled dist or gh-pages branch. In repository Settings > Pages, change Source to "gh-pages" branch or "GitHub Actions".'
+            );
+            return;
+          }
 
           var timer = setInterval(function() {
+            if (isMounted) return;
             if (progress < 92) {
               progress += Math.floor(Math.random() * 14) + 8;
               if (progress > 92) progress = 92;
@@ -100,9 +163,22 @@
             }
           }, 240);
 
+          // Listen for unhandled errors
+          window.addEventListener('error', function(e) {
+            if (!isMounted) {
+              window.bioShowError('Failed to load neural interface resources', e.message || 'Script execution error');
+            }
+          });
+
+          window.addEventListener('unhandledrejection', function(e) {
+            if (!isMounted) {
+              window.bioShowError('Asynchronous module failure', e.reason ? (e.reason.message || String(e.reason)) : 'Promise rejection');
+            }
+          });
+
           // Show fallback button if bundle download takes more than 7s
           setTimeout(function() {
-            if (fallback && document.getElementById('bio-loader-shell')) {
+            if (!isMounted && fallback && document.getElementById('bio-loader-shell')) {
               fallback.style.display = 'block';
             }
           }, 7000);

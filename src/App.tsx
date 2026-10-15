@@ -164,6 +164,12 @@ function MainAppContent() {
 }
 
 export default function App() {
+  React.useEffect(() => {
+    if (typeof window.bioAppMounted === 'function') {
+      window.bioAppMounted();
+    }
+  }, []);
+
   return (
     <ErrorBoundary>
       <SimulationProvider>
