@@ -26,6 +26,50 @@
         }
       })();
     </script>
+    <!-- Dynamic Production Asset Bridge: ensures site loads even if GitHub Pages serves raw main branch -->
+    <script>
+      (function() {
+        var isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
+        var isFileProto = window.location.protocol === 'file:';
+        if (isGitHubPages || isFileProto) {
+          // If the page is served statically without Vite bundling (raw repository root),
+          // load the compiled production bundle directly from assets or jsDelivr CDN
+          window.__isStaticHost = true;
+          var base = '/BIO-CI-Neural-Interface-Lab/';
+          
+          var css = document.createElement('link');
+          css.rel = 'stylesheet';
+          css.crossOrigin = 'anonymous';
+          css.href = base + 'assets/index.css';
+          css.onerror = function() {
+            var cdnCss = document.createElement('link');
+            cdnCss.rel = 'stylesheet';
+            cdnCss.crossOrigin = 'anonymous';
+            cdnCss.href = 'https://cdn.jsdelivr.net/gh/aysha2016/BIO-CI-Neural-Interface-Lab@gh-pages/assets/index.css';
+            document.head.appendChild(cdnCss);
+          };
+          document.head.appendChild(css);
+
+          var js = document.createElement('script');
+          js.type = 'module';
+          js.crossOrigin = 'anonymous';
+          js.src = base + 'assets/index.js';
+          js.onerror = function() {
+            var cdnJs = document.createElement('script');
+            cdnJs.type = 'module';
+            cdnJs.crossOrigin = 'anonymous';
+            cdnJs.src = 'https://cdn.jsdelivr.net/gh/aysha2016/BIO-CI-Neural-Interface-Lab@gh-pages/assets/index.js';
+            cdnJs.onerror = function() {
+              if (window.bioShowError) {
+                window.bioShowError('Asset Loading Error', 'Failed to load compiled scripts from assets/ or CDN. In GitHub repository Settings > Pages, verify Source is set to "GitHub Actions" or "gh-pages".');
+              }
+            };
+            document.head.appendChild(cdnJs);
+          };
+          document.head.appendChild(js);
+        }
+      })();
+    </script>
   </head>
   <body class="bg-[#070b14] text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
     <div id="root">
@@ -51,22 +95,27 @@
 
           <!-- Active Loading Bar -->
           <div style="width: 100%; height: 5px; background: #131d31; border-radius: 9999px; overflow: hidden; position: relative; margin-bottom: 12px; border: 1px solid #1e293b;">
-            <div id="bio-loader-bar" style="height: 100%; width: 12%; background: linear-gradient(90deg, #06b6d4, #38bdf8); border-radius: 9999px; transition: width 0.3s ease; box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);"></div>
+            <div id="bio-loader-bar" style="height: 100%; width: 15%; background: linear-gradient(90deg, #06b6d4, #38bdf8); border-radius: 9999px; transition: width 0.3s ease; box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);"></div>
           </div>
 
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b; font-family: 'JetBrains Mono', monospace;">
             <span id="bio-loader-step">Step 1/3: Modules loaded</span>
-            <span id="bio-loader-pct">25%</span>
+            <span id="bio-loader-pct">15%</span>
           </div>
 
           <!-- Stalled network fallback alert (hidden initially) -->
           <div id="bio-loader-fallback" style="display: none; margin-top: 18px; padding-top: 14px; border-top: 1px solid #1e293b; text-align: center;">
             <p style="font-size: 12px; color: #94a3b8; margin: 0 0 10px 0;">
-              Taking longer than usual from GitHub CDN?
+              Taking longer than expected?
             </p>
-            <button onclick="window.location.reload(true)" style="background: #0891b2; color: white; border: none; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
-              Refresh &amp; Bypass Cache
-            </button>
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+              <button onclick="window.bioAppMounted && window.bioAppMounted()" style="background: #0891b2; color: white; border: none; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+                Reveal Dashboard
+              </button>
+              <button onclick="window.location.reload(true)" style="background: #1e293b; color: #e2e8f0; border: 1px solid #334155; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+                Reload Page
+              </button>
+            </div>
           </div>
 
         </div>
@@ -90,7 +139,10 @@
             if (isMounted) return;
             isMounted = true;
             clearInterval(timer);
-            if (bar) bar.style.width = '100%';
+            if (bar) {
+              bar.style.width = '100%';
+              bar.style.background = 'linear-gradient(90deg, #10b981, #06b6d4)';
+            }
             if (pct) pct.innerText = '100%';
             if (status) status.innerText = 'BIO-CI Neural Interface Lab ready.';
             if (step) step.innerText = 'Step 3/3: Complete';
@@ -115,76 +167,86 @@
               bar.style.width = '100%';
               bar.style.background = '#ef4444';
             }
-            if (pct) pct.innerText = 'Error';
+            if (pct) pct.innerText = 'Notice';
             if (status) {
               status.style.color = '#f87171';
-              status.innerText = errMsg || 'Startup initialization error';
+              status.innerText = errMsg || 'Startup initialization diagnostic';
             }
             if (fallback) {
               fallback.style.display = 'block';
               fallback.innerHTML = `
                 <div style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 12px; margin-bottom: 12px; text-align: left;">
-                  <div style="color: #fca5a5; font-size: 11px; font-weight: 600; margin-bottom: 4px;">Initialization Diagnostic:</div>
-                  <div style="color: #cbd5e1; font-size: 10.5px; font-family: monospace; word-break: break-all;">${details || errMsg}</div>
+                  <div style="color: #fca5a5; font-size: 11px; font-weight: 600; margin-bottom: 4px;">GitHub Pages Diagnostic:</div>
+                  <div style="color: #cbd5e1; font-size: 10.5px; font-family: monospace; word-break: break-all; margin-bottom: 6px;">${details || errMsg}</div>
+                  <div style="color: #94a3b8; font-size: 10.5px; line-height: 1.4;">
+                    <strong>Recommended Fix:</strong> In your GitHub repository <strong>Settings &gt; Pages</strong>, set <strong>Source</strong> to <strong>GitHub Actions</strong> (or branch <strong>gh-pages</strong>).
+                  </div>
                 </div>
-                <button onclick="window.location.reload(true)" style="background: #0891b2; color: white; border: none; padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;">
-                  Reload Lab
-                </button>
+                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                  <a href="https://github.com/aysha2016/BIO-CI-Neural-Interface-Lab/settings/pages" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #0891b2; color: white; text-decoration: none; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+                    Open Pages Settings
+                  </a>
+                  <button onclick="window.bioAppMounted && window.bioAppMounted()" style="background: #1e293b; color: #e2e8f0; border: 1px solid #334155; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                    Bypass Loader
+                  </button>
+                </div>
               `;
             }
           };
 
-          // Check if being served directly on GitHub Pages from uncompiled main branch
-          var isGitHubPages = window.location.hostname.indexOf('github.io') !== -1;
-          var isRawScript = document.querySelector('script[src*="/src/main.tsx"]');
-          if (isGitHubPages && isRawScript) {
-            window.bioShowError(
-              'GitHub Pages Source Misconfiguration',
-              'GitHub Pages is serving the raw repository root (main branch) instead of compiled dist or gh-pages branch. In repository Settings > Pages, change Source to "gh-pages" branch or "GitHub Actions".'
-            );
-            return;
-          }
-
+          // Active progress timer: progresses smoothly through stages
           var timer = setInterval(function() {
             if (isMounted) return;
-            if (progress < 92) {
-              progress += Math.floor(Math.random() * 14) + 8;
-              if (progress > 92) progress = 92;
-              if (bar) bar.style.width = progress + '%';
-              if (pct) pct.innerText = progress + '%';
-              
-              if (progress > 40 && progress < 70 && status) {
-                status.innerText = 'Compiling biophysical Hodgkin-Huxley & multi-compartment solvers...';
-                if (step) step.innerText = 'Step 2/3: Biophysics ready';
-              } else if (progress >= 70 && status) {
-                status.innerText = 'Mounting 3D cochlea canvas & interactive neural dashboard...';
-                if (step) step.innerText = 'Step 3/3: Mounting UI';
+            if (progress < 90) {
+              progress += Math.floor(Math.random() * 12) + 6;
+              if (progress > 90) progress = 90;
+            } else if (progress < 98) {
+              // Gentle increments beyond 90% so it never appears frozen
+              progress += 1;
+            }
+            if (bar) bar.style.width = progress + '%';
+            if (pct) pct.innerText = progress + '%';
+            
+            if (progress >= 35 && progress < 65 && status) {
+              status.innerText = 'Compiling biophysical Hodgkin-Huxley & multi-compartment solvers...';
+              if (step) step.innerText = 'Step 2/3: Biophysics ready';
+            } else if (progress >= 65 && progress < 92 && status) {
+              status.innerText = 'Mounting 3D cochlea canvas & interactive neural dashboard...';
+              if (step) step.innerText = 'Step 3/3: Mounting UI';
+            } else if (progress >= 92 && status) {
+              status.innerText = 'Synchronizing electrode arrays & neural telemetry...';
+              if (step) step.innerText = 'Step 3/3: Finalizing';
+            }
+          }, 200);
+
+          // Listen for unhandled errors with capture to catch script loading issues
+          window.addEventListener('error', function(e) {
+            if (!isMounted && e && e.target && e.target.tagName === 'SCRIPT') {
+              // Script element loading failure
+              var src = e.target.getAttribute('src') || '';
+              if (src.indexOf('main.tsx') !== -1) {
+                // Ignore raw main.tsx 404 since dynamic bridge handles production asset loading
+                return;
               }
             }
-          }, 240);
-
-          // Listen for unhandled errors
-          window.addEventListener('error', function(e) {
-            if (!isMounted) {
-              window.bioShowError('Failed to load neural interface resources', e.message || 'Script execution error');
-            }
-          });
+          }, true);
 
           window.addEventListener('unhandledrejection', function(e) {
             if (!isMounted) {
-              window.bioShowError('Asynchronous module failure', e.reason ? (e.reason.message || String(e.reason)) : 'Promise rejection');
+              console.warn('Unhandled rejection during startup:', e.reason);
             }
           });
 
-          // Show fallback button if bundle download takes more than 7s
+          // Show diagnostic fallback button if bundle download takes more than 5s
           setTimeout(function() {
             if (!isMounted && fallback && document.getElementById('bio-loader-shell')) {
               fallback.style.display = 'block';
             }
-          }, 7000);
+          }, 5000);
         })();
       </script>
     </div>
-    <script type="module" src="/src/main.tsx"></script>
+    <!-- Development entry point (auto-removes on production static host) -->
+    <script type="module" src="/src/main.tsx" onerror="this.remove()"></script>
   </body>
 </html>

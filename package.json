@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build",
+    "build": "vite build && cp -rf dist/assets .",
     "start": "node server.js",
     "preview": "vite preview --port=3000 --host=0.0.0.0",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist assets",
     "lint": "tsc --noEmit",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"

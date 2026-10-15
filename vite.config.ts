@@ -19,6 +19,15 @@ export default defineConfig(({ command }) => {
       chunkSizeWarningLimit: 600,
       rollupOptions: {
         output: {
+          entryFileNames: 'assets/index.js',
+          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: (assetInfo) => {
+            const name = assetInfo.name || (assetInfo.names && assetInfo.names[0]) || '';
+            if (name.endsWith('.css')) {
+              return 'assets/index.css';
+            }
+            return 'assets/[name]-[hash][extname]';
+          },
           manualChunks(id) {
             if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
               return 'vendor-react';
